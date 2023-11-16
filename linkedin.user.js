@@ -60,7 +60,6 @@ function getUserInfo() {
     const nameEl = document.querySelector('h1')
 
     const name = nameEl?.innerText
-    // const jobTitle = nameEl?.parentElement?.parentElement?.parentElement?.nextElementSibling?.innerText
     const url = document.location.href
     const country = (() => {
       const s = document.querySelector('#top-card-text-details-contact-info')?.parentElement?.previousElementSibling?.innerText.trim().split(', ')
@@ -77,9 +76,6 @@ function getUserInfo() {
     const companyWhenJourney = lastJobLines?.children?.[1]?.querySelector('.visually-hidden')?.innerText.split(' · ')?.[0]
     const jobTitle = lastJobLastJourneyPosition || lastJobBoldRow
     const company = companyInHeader || companyWhenJourney
-
-    console.log(lastJobLines, lastJob, lastJobLastJourneyPosition, lastJobBoldRow)
-
 
     return {company, name, jobTitle, country, url}
 }
