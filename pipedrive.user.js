@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.pipedrive.com/*
 // @grant       none
-// @version     1.0
+// @version     1.1
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:36:30 AM
 // @run-at      document-end
@@ -26,7 +26,7 @@ async function main() {
     const jobTitleField = fields.find(it => it.innerText === 'Job title').querySelector('input')
     const linkedInField = fields.find(it => it.innerText === 'LinkedIn').querySelector('input')
     const sourceField = fields.find(it => it.innerText === 'Source (Required)')
-    const countryField = fields.find(it => it.innerText === 'Country')
+    const countryField = fields.find(it => it.innerText === 'Country (Required)')
 
     const modalHeader = modal.parentElement.parentElement.parentElement.parentElement.previousSibling
 
