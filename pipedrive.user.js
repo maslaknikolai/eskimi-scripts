@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.pipedrive.com/*
 // @grant       none
-// @version     1.2
+// @version     1.3
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:36:30 AM
 // @run-at      document-end
@@ -101,7 +101,7 @@ async function main() {
 
         select.querySelector('span[type="button"]').click()
         await sleep(300)
-        Array.from(select.querySelectorAll('[role="option"]')).find(it => it.innerText === 'Outbound').click()
+        Array.from(select.querySelectorAll('[role="option"]')).find(it => it.innerText === value)?.click()
       }
     }
   }
