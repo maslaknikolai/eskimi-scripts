@@ -3,8 +3,8 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/*
 // @grant       none
-// @version     1.1
-// @author      -
+// @version     1.2
+// @author      Nikolai Maslak
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
 // @updateURL    https://github.com/maslaknikolai/eskimi-scripts/raw/main/linkedin.meta.js
@@ -22,7 +22,7 @@ async function main() {
   function insertCopyButton() {
     const btnsRow = document.querySelector('.pvs-profile-actions')
 
-    const newBtn = $(`
+    const getInfoBtn = $(`
       <button
         class="
           artdeco-dropdown__trigger
@@ -34,20 +34,23 @@ async function main() {
           artdeco-button--2
         "
       >
-          🪝
+        ${SVG()}
       </button>
     `)
 
-    newBtn.onclick = () => {
+    getInfoBtn.onclick = () => {
       const userInfo = getUserInfo()
       console.log(userInfo)
-      navigator.clipboard.writeText(JSON.stringify({
-        ...userInfo,
-        lnkdn: true,
-      }, null, 4))
+      const clipboardData = { ...userInfo, lnkdn: true, }
+      navigator.clipboard.writeText(JSON.stringify(clipboardData, null, 4))
+
+      getInfoBtn.innerHTML = 'User info copied!'
+      setTimeout(() => {
+        getInfoBtn.innerHTML = SVG()
+      }, 1000)
     }
 
-    btnsRow.append(newBtn)
+    btnsRow.append(getInfoBtn)
   }
 }
 
@@ -112,4 +115,14 @@ function elementsFinderFactory() {
   return {
     on,
   };
+}
+
+function SVG() {
+  return `<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    width="20"
+  >
+    <path d="M20.05 9.61c0 3.93-2.53 6.62-6.15 6.62-1.73 0-3.15-.71-3.68-1.6l.03.91v5.63h-3.7V6.62c0-.2-.05-.25-.28-.25H5v-3.1h3.1c1.41 0 1.77 1.23 1.87 1.76.56-.94 2.02-2.03 4.1-2.03 3.58 0 5.98 2.66 5.98 6.61Zm-3.77.03c0-2.1-1.37-3.55-3.1-3.55-1.41 0-3.01.94-3.01 3.58 0 1.72.96 3.52 2.96 3.52 1.48 0 3.15-1.07 3.15-3.55Z"></path>
+  </svg>`
 }

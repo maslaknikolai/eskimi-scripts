@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.pipedrive.com/*
 // @grant       none
-// @version     1.1
+// @version     1.2
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:36:30 AM
 // @run-at      document-end
@@ -15,31 +15,56 @@
 main()
 
 async function main() {
-  const finder = elementsFinderFactory()
+  injectStyles()
 
+  const finder = elementsFinderFactory()
   finder.on('[data-test="left-panel"]', insertPasteButton)
 
   function insertPasteButton(modal) {
+    const modalTitle = modal.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.querySelector('header')?.innerText
+    if (modalTitle !== 'Add person') {
+      return
+    }
+
     const fields = Array.from(modal.querySelectorAll('[data-test-type]'))
-    const nameField = fields.find(it => it.innerText === 'Name').querySelector('input')
-    const orgField = fields.find(it => it.innerText === 'Organization').querySelector('input')
-    const jobTitleField = fields.find(it => it.innerText === 'Job title').querySelector('input')
-    const linkedInField = fields.find(it => it.innerText === 'LinkedIn').querySelector('input')
+
+    const nameField = fields.find(it => it.innerText === 'Name')?.querySelector('input')
+    const orgField = fields.find(it => it.innerText === 'Organization')?.querySelector('input')
+    const jobTitleField = fields.find(it => it.innerText === 'Job title')?.querySelector('input')
+    const linkedInField = fields.find(it => it.innerText === 'LinkedIn')?.querySelector('input')
     const sourceField = fields.find(it => it.innerText === 'Source (Required)')
     const countryField = fields.find(it => it.innerText === 'Country (Required)')
 
+    const pasteListenerInput = $(`
+      <input
+        placeholder="CTRL+V over here"
+        class="eskimiPasteListenerInput"
+      />
+    `)
     const modalHeader = modal.parentElement.parentElement.parentElement.parentElement.previousSibling
 
-    const myinput = $(`<input placeholder="CTRL+V over here">`)
+    modalHeader.append(pasteListenerInput)
 
-    myinput.onpaste = async (e) => {
+    setTimeout(() => {
+      pasteListenerInput.focus()
+    }, 500);
+
+    pasteListenerInput.oninput = () => {
+      pasteListenerInput.value = ''
+    }
+
+    pasteListenerInput.onpaste = async (e) => {
+      pasteListenerInput.value = 'Pasted!'
+
+      setTimeout(() => {
+        pasteListenerInput.value = ''
+      }, 500);
+
       e.preventDefault()
-
-      const pastedText = e.clipboardData.getData('text');
 
       const json = (() => {
         try {
-          return JSON.parse(pastedText)
+          return JSON.parse(e.clipboardData.getData('text'))
         } catch {
           return null
         }
@@ -49,41 +74,36 @@ async function main() {
         return
       }
 
-      if (sourceField) {
-        sourceField.querySelector('span[type="button"]').click()
-        await sleep(300)
-        Array.from(sourceField.querySelectorAll('[role="option"]')).find(it => it.innerText === 'Outbound').click()
-      }
-
-      if (countryField && json.country) {
-        countryField.querySelector('span[type="button"]').click()
-        await sleep(300)
-        Array.from(countryField.querySelectorAll('[role="option"]')).find(it => it.innerText === json.country)?.click()
-      }
-
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
-      const event = new Event('input', {bubbles: true});
-
-      const name = json.name?.replaceAll(/[^A-Za-z\s]/g, '') || ''
-      fillInput(nameField, name)
-
-      const linkedIn = json.url || ''
-      fillInput(linkedInField, linkedIn)
-
-      const jobTitle = json.jobTitle || ''
-      fillInput(jobTitleField, jobTitle)
-
-      const org = json.company || ''
-      fillInput(orgField, org)
+      fillInput(nameField, json.name)
+      fillInput(linkedInField, json.url)
+      fillInput(jobTitleField, json.jobTitle)
+      await fillSelect(sourceField, 'Outbound')
+      await fillSelect(countryField, json.country)
+      fillInput(orgField, json.company)
 
       function fillInput(input, value) {
+        if (!input || !value) {
+          return
+        }
+
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+        const event = new Event('input', {bubbles: true});
+
         input.focus()
         nativeInputValueSetter.call(input, value);
         input.dispatchEvent(event);
       }
-    }
 
-    modalHeader.append(myinput)
+      async function fillSelect(select, value) {
+        if (!select || !value) {
+          return
+        }
+
+        select.querySelector('span[type="button"]').click()
+        await sleep(300)
+        Array.from(select.querySelectorAll('[role="option"]')).find(it => it.innerText === 'Outbound').click()
+      }
+    }
   }
 }
 
@@ -132,4 +152,19 @@ function elementsFinderFactory() {
   return {
     on,
   };
+}
+
+function injectStyles() {
+  const styleEl = $(`<style>
+    .eskimiPasteListenerInput {
+      border: 1px solid transparent;
+      transition: all .3s;
+    }
+
+    .eskimiPasteListenerInput:focus {
+      border-color: blue;
+    }
+  </style>`)
+
+  document.head.append(styleEl)
 }
