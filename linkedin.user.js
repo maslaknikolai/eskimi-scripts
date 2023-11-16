@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/*
 // @grant       none
-// @version     1.2
+// @version     1.3
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
@@ -55,17 +55,31 @@ async function main() {
 }
 
 function getUserInfo() {
-    const company = Array.from(document.querySelectorAll('button')).find(it => it.getAttribute('aria-label')?.startsWith('Current company: '))?.innerText;
+    const companyInHeader = Array.from(document.querySelectorAll('button')).find(it => it.getAttribute('aria-label')?.startsWith('Current company: '))?.innerText;
 
     const nameEl = document.querySelector('h1')
 
     const name = nameEl?.innerText
-    const jobTitle = nameEl?.parentElement?.parentElement?.parentElement?.nextElementSibling?.innerText
+    // const jobTitle = nameEl?.parentElement?.parentElement?.parentElement?.nextElementSibling?.innerText
     const url = document.location.href
     const country = (() => {
       const s = document.querySelector('#top-card-text-details-contact-info')?.parentElement?.previousElementSibling?.innerText.trim().split(', ')
       return s[s.length-1]
     })()
+
+    const experience = document.querySelector('#experience')?.nextElementSibling?.nextElementSibling
+    const lastJob = experience?.querySelector('.pvs-entity--padded')
+    const lastJobLines = lastJob?.children?.[1]?.children?.[0]?.children?.[0]
+
+    const lastJobLastJourneyPosition = lastJob?.children?.[1]?.children?.[1]?.children?.[0]?.children?.[0]?.querySelector('.t-bold .visually-hidden')?.innerText
+    const lastJobBoldRow = lastJobLines?.querySelector('.t-bold .visually-hidden')?.innerText
+
+    const companyWhenJourney = lastJobLines?.children?.[1]?.querySelector('.visually-hidden')?.innerText.split(' · ')?.[0]
+    const jobTitle = lastJobLastJourneyPosition || lastJobBoldRow
+    const company = companyInHeader || companyWhenJourney
+
+    console.log(lastJobLines, lastJob, lastJobLastJourneyPosition, lastJobBoldRow)
+
 
     return {company, name, jobTitle, country, url}
 }
