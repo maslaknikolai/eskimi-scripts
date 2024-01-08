@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/*
 // @grant       none
-// @version     1.3
+// @version     1.4
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
@@ -17,10 +17,10 @@ main()
 async function main() {
   const finder = elementsFinderFactory()
 
-  finder.on('.pvs-profile-actions', insertCopyButton)
+  finder.on('.pv-top-card-v2-ctas', insertCopyButton)
 
-  function insertCopyButton() {
-    const btnsRow = document.querySelector('.pvs-profile-actions')
+  function insertCopyButton(el) {
+    const btnsRow = el.children[0]
 
     const getInfoBtn = $(`
       <button
