@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.pipedrive.com/*
 // @grant       none
-// @version     1.3
+// @version     1.4
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:36:30 AM
 // @run-at      document-end

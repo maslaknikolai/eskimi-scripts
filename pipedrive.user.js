@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*.pipedrive.com/*
 // @grant       none
-// @version     1.3
+// @version     1.4
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:36:30 AM
 // @run-at      document-end
@@ -21,7 +21,9 @@ async function main() {
   finder.on('[data-test="left-panel"]', insertPasteButton)
 
   function insertPasteButton(modal) {
-    const modalTitle = modal.parentElement?.parentElement?.parentElement?.parentElement?.parentElement?.querySelector('header')?.innerText
+    const modalHeader = document.querySelector('.cui5-compound-modal__header')
+    const modalTitle = modalHeader?.innerText
+
     if (modalTitle !== 'Add person') {
       return
     }
@@ -41,7 +43,6 @@ async function main() {
         class="eskimiPasteListenerInput"
       />
     `)
-    const modalHeader = modal.parentElement.parentElement.parentElement.parentElement.previousSibling
 
     modalHeader.append(pasteListenerInput)
 
