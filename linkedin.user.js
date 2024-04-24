@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/*
 // @grant       none
-// @version     1.6
+// @version     1.7
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
@@ -65,16 +65,17 @@ function getUserInfo() {
       return s[s.length-1]
     })()
 
-    const experience = document.querySelector('#experience')?.nextElementSibling?.nextElementSibling
-    const lastJob = experience?.querySelector('.pvs-entity--padded')
-    const lastJobLines = lastJob?.children?.[1]?.children?.[0]?.children?.[0]
+    const experience = Array.from(document.querySelectorAll('h2'))
+      .find(it => it.innerText.trim().startsWith('Experience'))
+      ?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement
 
-    const lastJobLastJourneyPosition = lastJob?.children?.[1]?.children?.[1]?.children?.[0]?.children?.[0]?.querySelector('.t-bold .visually-hidden')?.innerText
-    const lastJobBoldRow = lastJobLines?.querySelector('.t-bold .visually-hidden')?.innerText
+    const jobTitle = experience
+      ?.querySelector('[data-view-name="profile-component-entity"]')
+      ?.querySelector('.t-bold')
+      ?.innerText
+      .split('\n')[0]
 
-    const companyWhenJourney = lastJobLines?.children?.[1]?.querySelector('.visually-hidden')?.innerText.split(' · ')?.[0]
-    const jobTitle = lastJobLastJourneyPosition || lastJobBoldRow
-    const company = companyInHeader || companyWhenJourney
+    const company = companyInHeader
 
     return {company, name, jobTitle, country, url}
 }

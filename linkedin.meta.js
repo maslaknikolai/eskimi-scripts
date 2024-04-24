@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/in/*
 // @grant       none
-// @version     1.6
+// @version     1.7
 // @author      -
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
