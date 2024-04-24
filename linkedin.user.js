@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       *://*linkedin.com/*
 // @grant       none
-// @version     1.5
+// @version     1.6
 // @author      Nikolai Maslak
 // @description 11/16/2023, 4:01:58 AM
 // @run-at      document-end
@@ -16,12 +16,10 @@ main()
 
 async function main() {
   const finder = elementsFinderFactory()
-
-  finder.on('.pv-top-card-v2-ctas', insertCopyButton)
-  finder.on('.pv-top-card-v2-ctas__custom', insertCopyButton)
+  finder.on('#profile-sticky-header-toggle', insertCopyButton)
 
   function insertCopyButton(el) {
-    const btnsRow = el.children[0]
+    const btnsRow = el.previousElementSibling.lastElementChild
 
     const getInfoBtn = $(`
       <button
